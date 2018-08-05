@@ -25,4 +25,8 @@ The output is a seperator line, followed by a line of the SHA256 hash, and then 
 
 Bwahahahaha.  This is not a production ready tool.  It works well enough for me, and I like to think the source code is readable enough for anyone with passing familiarity with Ruby.  I wrote it while drinking beer, there's probably better ways of writing it, I take no responsibility for it, use it at your own risk.
 
+## Known Issues / Things
+
+- It leaves `dupcheck.db` in the directory you ran it in after it finishes.  I was torn between using an in-memory database, deleting the database file after the script finishes, or this.  I figured that it may be useful if anyone wants to use it for their own purposes... the script will delete it, if its there, when run... so beware.
+
  
