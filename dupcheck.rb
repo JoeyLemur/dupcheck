@@ -70,22 +70,34 @@ end
 # Wait a second for the database to catch up... this isn't optimal...
 sleep(1)
 
+# Count of how many duplicate entries
+dupEntryCount = 0
+
+# Count of how many wasted bytes
+wastedBytes = 0
+
 # Get what digests have more than one entry, and report on them
 results = db.execute('select digest, count(*) as c from files group by digest having c > 1')
-if results.count != 0 then
-  results.each do |r|
-    puts "-----"
-    puts "Hash: #{r[0]}"
-    entries = db.execute('select origPath,size,ctime,mtime from files where digest=?',r[0])
-    entries.each do |s|
-      puts s.join("\t")
-    end
+results.each do |r|
+  dupEntryCount += 1
+  puts "-----"
+  puts "Hash: #{r[0]}"
+  entries = db.execute('select origPath,size,ctime,mtime from files where digest=?',r[0])
+  tempCount = 0
+  fileSize = entries[0][1].to_i
+  entries.each do |s|
+    tempCount += 1
+    puts s.join("\t")
   end
-  puts ""
+  wastedBytes += fileSize * (tempCount-1)
 end
 
 # Cleanup and report
-STDERR.puts "   Start time: #{startTime}"
-STDERR.puts "     End time: #{Time.now}"
-STDERR.puts "Files checked: #{entryCount}"
+STDERR.puts <<-EOS
+     Start time: #{startTime}
+       End time: #{Time.now}
+  Files checked: #{entryCount}
+Duplicate files: #{dupEntryCount}
+   Wasted bytes: #{wastedBytes}
+EOS
 
