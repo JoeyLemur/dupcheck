@@ -24,9 +24,9 @@ extensions.map! { |i| i.downcase }
 startTime = Time.now
 
 # Open database
-#db = SQLite3::Database.new(':memory:')
-File.delete(DBNAME) if File.exist?(DBNAME)
-db = SQLite3::Database.new(DBNAME)
+db = SQLite3::Database.new(':memory:')
+#File.delete(DBNAME) if File.exist?(DBNAME)
+#db = SQLite3::Database.new(DBNAME)
 
 # Set up table, index, and insert statement
 db.execute 'CREATE TABLE files (origPath string, fileName string, size integer, ctime integer, mtime integer, digest string)'
@@ -41,7 +41,7 @@ foundCount = 0
 Find.find(startPoint) do |path|
   # Increment entryCount, report sometimes
   entryCount += 1
-  STDERR.puts "#{Time.now} - #{foundCount} / #{entryCount}" if entryCount % 10000 == 0
+  STDERR.puts "#{Time.now} - #{foundCount} / #{entryCount}" if entryCount % 100000 == 0
   
   # Skip if its not file
   next if not File.file?(path)
@@ -70,34 +70,36 @@ end
 # Wait a second for the database to catch up... this isn't optimal...
 sleep(1)
 
-# Count of how many duplicate entries
-dupEntryCount = 0
-
 # Count of how many wasted bytes
 wastedBytes = 0
 
-# Get what digests have more than one entry, and report on them
+# Storage for duplicate reports
+duplicates = []
+
+# Get what digests have more than one entry and store
 results = db.execute('select digest, count(*) as c from files group by digest having c > 1')
 results.each do |r|
-  dupEntryCount += 1
+  t = []
+  entries = db.execute('select origPath,size from files where digest=?',r[0])
+  fileSize = entries[0][1].to_i   # Get the file size
+  entries.each { |s| t << s[0] }  # Put the path in to the array
+  wastedBytes += fileSize * (t.count-1)  # Calculate wasted bytes
+  duplicates << t  # Store duplicates array
+end
+
+# Report duplicates
+duplicates.sort.each do |i|
   puts "-----"
-  puts "Hash: #{r[0]}"
-  entries = db.execute('select origPath,size,ctime,mtime from files where digest=?',r[0])
-  tempCount = 0
-  fileSize = entries[0][1].to_i
-  entries.each do |s|
-    tempCount += 1
-    puts s.join("\t")
-  end
-  wastedBytes += fileSize * (tempCount-1)
+  i.each { |j| puts j }
 end
 
 # Cleanup and report
 STDERR.puts <<-EOS
+
      Start time: #{startTime}
        End time: #{Time.now}
   Files checked: #{entryCount}
-Duplicate files: #{dupEntryCount}
+Duplicate files: #{duplicates.count}
    Wasted bytes: #{wastedBytes}
 EOS
 
