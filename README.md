@@ -23,5 +23,6 @@ The output is a seperator line, followed by a line of the SHA256 hash, and then 
 
 ## Support
 
-Bwahahahaha.  This is not a production ready tool.  It works well enough for me, and I like to think the source code is readable enough for anyone with passing familiarity with Ruby.
+Bwahahahaha.  This is not a production ready tool.  It works well enough for me, and I like to think the source code is readable enough for anyone with passing familiarity with Ruby.  I wrote it while drinking beer, there's probably better ways of writing it, I take no responsibility for it, use it at your own risk.
+
  
