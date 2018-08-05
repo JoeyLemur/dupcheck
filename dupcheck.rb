@@ -67,6 +67,9 @@ Find.find(startPoint) do |path|
   insertStmt.execute(path,shortName,fileSize,ctime,mtime,fileDigest)
 end
 
+# Final report
+STDERR.puts "#{Time.now} - #{foundCount} / #{entryCount} (DONE)"
+
 # Wait a second for the database to catch up... this isn't optimal...
 sleep(1)
 
