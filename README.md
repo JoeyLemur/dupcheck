@@ -11,7 +11,7 @@ So, I found myself with many years worth of USB backup drives and nested 'Old Ho
 
 `ruby dupcheck.rb <path> [<extension> ...]`
   
-Example: `ruby dupcheck.rb /path/to/dir jpg jpeg`
+Example: `ruby dupcheck.rb /path/to/dir jpg jpeg > duplicate_jpgs.txt`
 
 ## How it works
 
