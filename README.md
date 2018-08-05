@@ -19,7 +19,7 @@ It uses Ruby's `File.find` from the provided path to search for directory entrie
 
 After the `File.find` is complete, the database is queried for multiple entries with the same SHA256 hash.  These are grouped together and written to STDIN, for piping out to a file for later analysis.
 
-The output is a seperator line, followed by a line of the SHA256 hash, and then tab-delimited entries for each file: path, file size, ctime, mtime
+The output is grouped by identical files (by SHA256 hash), with a seperator.
 
 ## Support
 
