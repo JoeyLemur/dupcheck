@@ -1,7 +1,6 @@
 require 'find'
 require 'digest'
 require 'sqlite3'
-require 'pp'
 
 # Used when storing database
 DBNAME = "dupcheck.db"
@@ -29,10 +28,10 @@ startTime = Time.now
 File.delete(DBNAME) if File.exist?(DBNAME)
 db = SQLite3::Database.new(DBNAME)
 
+# Set up table, index, and insert statement
 db.execute 'CREATE TABLE files (origPath string, fileName string, size integer, ctime integer, mtime integer, digest string)'
 db.execute 'CREATE INDEX idx_files_digest on files(digest)'
 insertStmt = db.prepare("insert into files (origPath,fileName,size,ctime,mtime,digest) values (?,?,?,?,?,?)")
-
 
 # Counter for directory entry count and found entry count
 entryCount = 0
@@ -72,7 +71,7 @@ end
 sleep(1)
 
 # Get what digests have more than one entry, and report on them
-results = db.execute('select digest, count(*) as c from files group by digest having c>1')
+results = db.execute('select digest, count(*) as c from files group by digest having c > 1')
 if results.count != 0 then
   results.each do |r|
     puts "-----"
